@@ -40,7 +40,6 @@ public class JwtFilter extends OncePerRequestFilter
             throws ServletException, IOException {
 
         if (request.getCookies() == null) {
-            System.out.println("empty");
             filterChain.doFilter(request, response);
             return;
         }
