@@ -57,7 +57,6 @@ public class FileUploadService {
     }
 
     public Function<MultipartFile,String> uploadFile(){
-        System.out.println(PATH);
         return file->{
             try {
                 return doUpload(file);

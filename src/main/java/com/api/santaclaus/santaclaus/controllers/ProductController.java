@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.api.santaclaus.santaclaus.dto.ProductRequest;
 import com.api.santaclaus.santaclaus.models.Product;
 import com.api.santaclaus.santaclaus.services.FileUploadService;
 import com.api.santaclaus.santaclaus.services.ProductService;
@@ -50,7 +51,6 @@ public class ProductController {
     // }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-
     public ResponseEntity<Product> addProduct(
             @RequestParam("product") String p,
             @RequestParam("image") MultipartFile file) throws Exception {
@@ -58,7 +58,8 @@ public class ProductController {
         return ResponseEntity.ok(
                 UrlMapper.withImageUrl(Product::getProductImage,
                         Product::setProductImage, "/products/view/")
-                        .apply(productService.addProduct(mapper.readValue(p, Product.class), file)));
+                        .apply(productService.addProduct(mapper.readValue(p, ProductRequest.class), file)));
+
     }
 
     @PostMapping("/upload")
@@ -89,5 +90,14 @@ public class ProductController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<Product> getProductByName(@RequestParam("product") String productName) {
+
+        Product exists = productService.findByName(productName);
+        return ResponseEntity
+                .ok(UrlMapper.withImageUrl(Product::getProductImage, Product::setProductImage, "/products/view/")
+                        .apply(exists));
     }
 }
