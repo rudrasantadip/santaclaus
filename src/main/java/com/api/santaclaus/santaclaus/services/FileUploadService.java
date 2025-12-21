@@ -45,7 +45,6 @@ public class FileUploadService {
         Path target = uploadDir.resolve(fileName);
         Files.copy(file.getInputStream(), target);
 
-        System.out.println("uploaded successfully");
         return fileName;
     }
 
