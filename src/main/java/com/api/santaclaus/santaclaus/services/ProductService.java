@@ -1,6 +1,7 @@
 package com.api.santaclaus.santaclaus.services;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -72,6 +73,10 @@ public class ProductService {
     public Product findByName(String name) {
         return productRepository.findByProductName(name)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
+
+    public List<Product> findAllProducts(){
+            return productRepository.findAll();
     }
 
 }

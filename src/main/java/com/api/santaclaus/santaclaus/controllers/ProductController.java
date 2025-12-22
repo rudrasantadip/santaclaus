@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -99,5 +100,15 @@ public class ProductController {
         return ResponseEntity
                 .ok(UrlMapper.withImageUrl(Product::getProductImage, Product::setProductImage, "/products/view/")
                         .apply(exists));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<Product>> getAllProducts() {
+        return ResponseEntity.ok(
+                productService.findAllProducts().stream()
+                        .map(p -> UrlMapper
+                                .withImageUrl(Product::getProductImage, Product::setProductImage, "/products/view/")
+                                .apply(p))
+                        .toList());
     }
 }
