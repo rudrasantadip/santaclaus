@@ -8,20 +8,17 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileUploadService {
-
-    @Value("${project.image}")
-    private String PATH;
 
     private static final Set<String> ALLOWED_FILE_TYPES= Set.of(
         "image/png","image/jpeg","image/jpg"
@@ -29,7 +26,7 @@ public class FileUploadService {
 
     private Predicate<MultipartFile> isAllowedImage = file -> file.getContentType()!=null && ALLOWED_FILE_TYPES.contains(file.getContentType());
 
-    public String doUpload(MultipartFile file) throws IOException{
+    public String doUpload(MultipartFile file, String uploadPath) throws IOException{
 
         if(!isAllowedImage.test(file)){
             throw new IOException("Only PNG and JPG and JPEG images are allowed");
@@ -39,7 +36,7 @@ public class FileUploadService {
         .substring(file.getOriginalFilename().lastIndexOf("."));
         String fileName = UUID.randomUUID().toString()+extension;
 
-        Path uploadDir = Paths.get(PATH);
+        Path uploadDir = Paths.get(uploadPath);
         Files.createDirectories(uploadDir);
 
         Path target = uploadDir.resolve(fileName);
@@ -55,14 +52,27 @@ public class FileUploadService {
         return file;
     }
 
-    public Function<MultipartFile,String> uploadFile(){
-        return file->{
+    public BiFunction<MultipartFile,String,String> uploadFile(){
+        return (file,path)->{
             try {
-                return doUpload(file);
+                return doUpload(file,path);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException("File upload failed", e);
             }
         };
+    }
+
+    public BiFunction<List<MultipartFile>,String, List<String>> uploadFiles(){
+        return (files, path) -> files.stream()
+        .filter(file -> file != null && !file.isEmpty())
+        .map(file -> {
+            try {
+                return doUpload(file, path);
+            } catch (IOException e) {
+                throw new RuntimeException("File upload failed", e);
+            }
+        })
+        .toList();
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FileUploadService fileUploadService;
     private final CategoryService categoryService;
+
+    @Value("${project.image}")
+    private String PATH;
 
     private static Consumer<Product> isNotNull() {
         return p -> {
@@ -66,6 +70,7 @@ public class ProductService {
                         PreSave
                                 .<Product>setImageOnProduct(
                                         file,
+                                        PATH,
                                         fileUploadService.uploadFile(),
                                         Product::setProductImage));
     }

@@ -66,7 +66,7 @@ public class ProductController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile file) {
         try {
-            String response = fileUploadService.doUpload(file);
+            String response = fileUploadService.doUpload(file,uploadPath);
             return ResponseEntity.ok(
                     ServletUriComponentsBuilder.fromCurrentContextPath()
                             .path("products/view/")
