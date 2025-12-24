@@ -15,7 +15,6 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.api.santaclaus.santaclaus.dto.ProductRequest;
 import com.api.santaclaus.santaclaus.models.Product;
+import com.api.santaclaus.santaclaus.models.SampleImage;
 import com.api.santaclaus.santaclaus.services.FileUploadService;
 import com.api.santaclaus.santaclaus.services.ProductService;
 import com.api.santaclaus.santaclaus.services.utils.UrlMapper;
@@ -44,12 +44,6 @@ public class ProductController {
     public String uploadPath;
 
     private final ObjectMapper mapper;
-
-    // @PostMapping("/add")
-    // public ResponseEntity<Product> addProduct(@RequestBody Product p) throws
-    // Exception{
-    // return ResponseEntity.ok(productService.addProduct(p));
-    // }
 
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> addProduct(
@@ -106,9 +100,23 @@ public class ProductController {
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(
                 productService.findAllProducts().stream()
-                        .map(p -> UrlMapper
+                        .map(p -> 
+                            {
+                                UrlMapper
                                 .withImageUrl(Product::getProductImage, Product::setProductImage, "/products/view/")
-                                .apply(p))
+                                .apply(p);
+                                
+                                if(p.getSampleImages()!=null){
+                                    p.getSampleImages().forEach(image->
+                                        UrlMapper.withImageUrl(SampleImage::getImageUrl,
+                                             SampleImage::setImageUrl, 
+                                             "/products/view/")
+                                             .apply(image)
+                                    );
+                                }
+                                
+                                return p;
+                            })
                         .toList());
     }
 }
