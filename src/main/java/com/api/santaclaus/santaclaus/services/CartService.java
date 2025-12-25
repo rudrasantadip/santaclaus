@@ -44,6 +44,12 @@ public class CartService {
                 .orElseThrow(() -> new Exception("User not found"));
     }
 
+    public Cart findCartByUser(String username) throws Exception{
+        return cartRepo.findByUser(authService.findUserByName(username))
+        .orElseThrow(()->new Exception("Üser not found"));
+       
+    }
+
     public CartDto viewCart(UserModel userModel) throws Exception {
         return DtoConverter.map(
                 // arg1
