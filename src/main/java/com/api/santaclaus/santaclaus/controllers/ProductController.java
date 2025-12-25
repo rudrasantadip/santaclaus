@@ -91,6 +91,12 @@ public class ProductController {
     public ResponseEntity<Product> getProductByName(@RequestParam("product") String productName) {
 
         Product exists = productService.findByName(productName);
+        exists.getSampleImages().forEach(image->
+                                        UrlMapper.withImageUrl(SampleImage::getImageUrl,
+                                             SampleImage::setImageUrl, 
+                                             "/products/view/")
+                                             .apply(image));
+
         return ResponseEntity
                 .ok(UrlMapper.withImageUrl(Product::getProductImage, Product::setProductImage, "/products/view/")
                         .apply(exists));

@@ -26,8 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Product 
-{
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
@@ -44,10 +43,17 @@ public class Product
     private Category category;
 
     @Builder.Default
-    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SampleImage> sampleImages = new ArrayList<>();
 
-    public void addSampleImage(SampleImage sampleImage){
+    @OneToMany(mappedBy = "product", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "product",orphanRemoval = true, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<CartItem> cartItems; 
+
+    public void addSampleImage(SampleImage sampleImage) {
         sampleImages.add(sampleImage);
         sampleImage.setProduct(this);
     }

@@ -41,4 +41,9 @@ public class AuthService
         } 
         return "";
 }
+
+public UserModel findUserByName(String username) throws Exception{
+    return userRepository.findByUsername(username)
+    .orElseThrow(()-> new Exception("User not found"));
+}
 }
